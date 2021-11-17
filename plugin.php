@@ -14,38 +14,38 @@ var $author = "grntbg";
 
 function init()
 {
-    parent::init();
+	parent::init();
 	
-    // Language definitions.
-    $this->eso->addLanguage("forumSkin", "Forum skin");
+	// Language definitions.
+	$this->eso->addLanguage("forumSkin", "Forum skin");
 
 	// If we're on the settings view, add the skin settings!
 	if ($this->eso->action == "settings") {
 		$this->eso->controller->addHook("init", array($this, "addSkinSettings"));
 	}
 
-    // Apply the stylesheet for the skin that the user has selected.
+	// Apply the stylesheet for the skin that the user has selected.
 //	$this->eso->addToHead("<link rel='stylesheet' href='" . $this->eso->user["skin"] . "/styles.css' type='text/css'/>");
 
-    // Apply the stylesheet for the skin that the user has selected.
+	// Apply the stylesheet for the skin that the user has selected.
 	if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
     
 	// If the user's skin is different from the forum's, deny access to the forum skin.
-    elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET' && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
+	elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET' && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
         header('HTTP/1.0 403 Forbidden', TRUE, 403);
         die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
-    }
+	}
 }
 
 // Loop through the skins directory to create a string of options to go in the skin <select> tag.
 function addSkinSettings(&$settings)
 {
 	global $language, $config;
-    $this->skins = $this->eso->getSkins();
+	$this->skins = $this->eso->getSkins();
 
-    $skinOptions = "";
-    $memberId = $this->eso->user["memberId"];
-    // if (in_array(@$_POST["validateSkin"], $this->skins)) $skinOptions["skin"] = $_POST["validateSkin"];
+	$skinOptions = "";
+	$memberId = $this->eso->user["memberId"];
+//	if (in_array(@$_POST["validateSkin"], $this->skins)) $skinOptions["skin"] = $_POST["validateSkin"];
 
 	foreach ($this->skins as $v) {
 		$value = ($v == $config["skin"]) ? "" : $v;
@@ -56,18 +56,18 @@ function addSkinSettings(&$settings)
 		"id" => "skin",
 		"html" => "<label>{$language["forumSkin"]}</label> <select id='skin' name='skin'>$skinOptions</select>",
 		"databaseField" => "skin",
-        "required" => true,
-        "validate" => array($this, "validateSkin")
+		"required" => true,
+		"validate" => array($this, "validateSkin")
 	), 150);
 }
 
 // Validate the skin field: make sure the selected skin actually exists.
 function validateSkin(&$skin)
 {
-    global $config;
+	global $config;
 	if (!in_array($skin, $this->skins)) $skin = "";
 
-    // Change the user's skin.
+	// Change the user's skin.
 	$this->eso->db->query("UPDATE {$config["tablePrefix"]}members SET skin='$skin' WHERE memberId={$this->eso->user["memberId"]}");
 	$this->eso->user["skin"] = $_SESSION["user"]["skin"] = $skin;
 }
