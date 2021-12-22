@@ -27,14 +27,26 @@ function init()
 	// Apply the stylesheet for the skin that the user has selected.
 //	$this->eso->addToHead("<link rel='stylesheet' href='" . $this->eso->user["skin"] . "/styles.css' type='text/css'/>");
 
-	// Apply the stylesheet for the skin that the user has selected.
-	if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
+	// Apply the stylesheet for the skin that the user has selected... NOT!!!
+	//if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
+	
+	// We need to hook the eso controller's init function instead...
+	$this->eso->addHook("init", array($this, "setSkin"));
     
 	// If the user's skin is different from the forum's, deny access to the forum skin.
-	elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET' && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
-        header('HTTP/1.0 403 Forbidden', TRUE, 403);
-        die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
-	}
+	// I'm commenting this out because it just doesn't work at the moment.
+	// I did fix the syntax error with it that would brick your skins tab in your dashboard if you tried to install the skin so that's a plus.
+	//elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET') && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
+        //header('HTTP/1.0 403 Forbidden', TRUE, 403);
+        //die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
+	//}
+}
+
+// ... NOW we apply the skin!
+function setSkin()
+{
+    // Apply the stylesheet for the skin that the user has selected.
+	if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
 }
 
 // Loop through the skins directory to create a string of options to go in the skin <select> tag.
