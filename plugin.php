@@ -8,7 +8,7 @@ class MemberSkins extends Plugin {
 
 var $id = "MemberSkins";
 var $name = "MemberSkins";
-var $version = "1.0";
+var $version = "1.1";
 var $description = "Allows users to change their skins";
 var $author = "grntbg";
 
@@ -24,29 +24,38 @@ function init()
 		$this->eso->controller->addHook("init", array($this, "addSkinSettings"));
 	}
 
-	// Apply the stylesheet for the skin that the user has selected.
-//	$this->eso->addToHead("<link rel='stylesheet' href='" . $this->eso->user["skin"] . "/styles.css' type='text/css'/>");
-
-	// Apply the stylesheet for the skin that the user has selected... NOT!!!
-	//if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
-	
-	// We need to hook the eso controller's init function instead...
 	$this->eso->addHook("init", array($this, "setSkin"));
-    
-	// If the user's skin is different from the forum's, deny access to the forum skin.
-	// I'm commenting this out because it just doesn't work at the moment.
-	// I did fix the syntax error with it that would brick your skins tab in your dashboard if you tried to install the skin so that's a plus.
-	//elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET') && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
-        //header('HTTP/1.0 403 Forbidden', TRUE, 403);
-        //die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
-	//}
+
+//	elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET') && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
+//		header('HTTP/1.0 403 Forbidden', TRUE, 403);
+//		die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
+//	}
 }
 
 // ... NOW we apply the skin!
 function setSkin()
 {
+	global $config;
     // Apply the stylesheet for the skin that the user has selected.
-	if (isset($this->eso->user["skin"])) $this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
+	if (isset($this->eso->user["skin"])) {
+		$this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
+		$this->removeCSS("skins/{$config["skin"]}/styles.css");
+	}
+}
+
+function removeCSS($styleSheet, $media = false)
+{
+	global $config;
+	$this->styleSheets = $this->eso->styleSheets;
+
+	if (!in_array(array("href" => $styleSheet, "media" => $media), $this->styleSheets)) return false;
+	// todo...
+//	removeFromArray($this->styleSheets, array("href" => $styleSheet, "media" => $media));
+
+//	ksort($this->styleSheets);
+//	foreach ($this->styleSheets as $styleSheet) {
+//		if ($styleSheet["href"] == $config["skin"]) unset($styleSheet["href"]);
+//	}
 }
 
 // Loop through the skins directory to create a string of options to go in the skin <select> tag.
