@@ -8,7 +8,7 @@ class MemberSkins extends Plugin {
 
 var $id = "MemberSkins";
 var $name = "MemberSkins";
-var $version = "1.1";
+var $version = "1.2";
 var $description = "Allows users to change their skins";
 var $author = "grntbg";
 
@@ -25,11 +25,6 @@ function init()
 	}
 
 	$this->eso->addHook("init", array($this, "setSkin"));
-
-//	elseif ((($this->eso->user["skin"]) != $this->eso->skin) && ($_SERVER['REQUEST_METHOD']=='GET') && realpath("/skins/" . $this->eso->skin . "/styles.css")) {
-//		header('HTTP/1.0 403 Forbidden', TRUE, 403);
-//		die(header("location:/skins/" . $this->eso->skin . "/styles.css"));
-//	}
 }
 
 // ... NOW we apply the skin!
@@ -39,23 +34,16 @@ function setSkin()
     // Apply the stylesheet for the skin that the user has selected.
 	if (isset($this->eso->user["skin"])) {
 		$this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
-		$this->removeCSS("skins/{$config["skin"]}/styles.css");
+		$this->removeCSS();
 	}
 }
 
-function removeCSS($styleSheet, $media = false)
+function removeCSS()
 {
 	global $config;
-	$this->styleSheets = $this->eso->styleSheets;
 
-	if (!in_array(array("href" => $styleSheet, "media" => $media), $this->styleSheets)) return false;
-	// todo...
-//	removeFromArray($this->styleSheets, array("href" => $styleSheet, "media" => $media));
-
-//	ksort($this->styleSheets);
-//	foreach ($this->styleSheets as $styleSheet) {
-//		if ($styleSheet["href"] == $config["skin"]) unset($styleSheet["href"]);
-//	}
+	// If the configured skin isn't being applied, remove the stylesheet from the array.
+	if ($this->eso->user["skin"] != $config["skin"]) unset($this->eso->styleSheets["1"]);
 }
 
 // Loop through the skins directory to create a string of options to go in the skin <select> tag.
@@ -69,7 +57,8 @@ function addSkinSettings(&$settings)
 //	if (in_array(@$_POST["validateSkin"], $this->skins)) $skinOptions["skin"] = $_POST["validateSkin"];
 
 	foreach ($this->skins as $v) {
-		$value = ($v == $config["skin"]) ? "" : $v;
+		$default = $config["skin"];
+		$value = ($v == $config["skin"]) ? $default : $v;
 		$skinOptions .= "<option value='$value'" . ($this->eso->db->result("SELECT skin FROM {$config["tablePrefix"]}members WHERE memberId=$memberId", 0) == $value ? " selected='selected'" : "") . ">$v</option>";
 	}
 
