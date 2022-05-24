@@ -32,18 +32,11 @@ function setSkin()
 {
 	global $config;
     // Apply the stylesheet for the skin that the user has selected.
-	if (isset($this->eso->user["skin"])) {
+	if (!empty($this->eso->user["skin"])) {
 		$this->eso->addCSS("skins/" . $this->eso->user["skin"] . "/styles.css");
-		$this->removeCSS();
+		// Remove the stylesheet of the configured skin from the array.
+		unset($this->eso->styleSheets["1"]);
 	}
-}
-
-function removeCSS()
-{
-	global $config;
-
-	// If the configured skin isn't being applied, remove the stylesheet from the array.
-	if ($this->eso->user["skin"] != $config["skin"]) unset($this->eso->styleSheets["1"]);
 }
 
 // Loop through the skins directory to create a string of options to go in the skin <select> tag.
@@ -54,7 +47,6 @@ function addSkinSettings(&$settings)
 
 	$skinOptions = "";
 	$memberId = $this->eso->user["memberId"];
-//	if (in_array(@$_POST["validateSkin"], $this->skins)) $skinOptions["skin"] = $_POST["validateSkin"];
 
 	foreach ($this->skins as $v) {
 		$value = ($v == $config["skin"]) ? "" : $v;
