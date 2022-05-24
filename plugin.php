@@ -57,8 +57,7 @@ function addSkinSettings(&$settings)
 //	if (in_array(@$_POST["validateSkin"], $this->skins)) $skinOptions["skin"] = $_POST["validateSkin"];
 
 	foreach ($this->skins as $v) {
-		$default = $config["skin"];
-		$value = ($v == $config["skin"]) ? $default : $v;
+		$value = ($v == $config["skin"]) ? "" : $v;
 		$skinOptions .= "<option value='$value'" . ($this->eso->db->result("SELECT skin FROM {$config["tablePrefix"]}members WHERE memberId=$memberId", 0) == $value ? " selected='selected'" : "") . ">$v</option>";
 	}
 
